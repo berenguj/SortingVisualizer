@@ -13,7 +13,15 @@ function uuidv4() {
 var ARRAY_LENGTH = 300;
 var LEFT = 0;
 var RIGHT = 299;
-var testArr = [38, 27, 43, 3, 9, 82, 10];
+var testArr = [
+  { key: 0, value: 38 },
+  { key: 1, value: 27 },
+  { key: 2, value: 43 },
+  { key: 3, value: 3 },
+  { key: 4, value: 9 },
+  { key: 5, value: 82 },
+  { key: 6, value: 10 },
+];
 
 function App() {
   const [arr, setArr] = useState([]);
@@ -34,11 +42,11 @@ function App() {
     for (let i = 0; i < ARRAY_LENGTH; i++) {
       addRandomNum();
     }
-    console.log("created arr");
-    console.log(arr);
+    //console.log("created arr");
+    //console.log(arr);
   }
 
-  function merge(array, l, m, r) {
+  function merge(array, l, m, r, animations) {
     var i, j, k;
     var left = m - l + 1;
     var right = r - m;
@@ -61,39 +69,76 @@ function App() {
     j = 0;
     k = l;
     while (i < left && j < right) {
+      const animation = {};
+      animation.compare = [i, j];
       if (L[i].value <= R[j].value) {
         array[k] = L[i];
+        animation.swap = [k, i];
         i++;
+        console.log("left");
       } else {
         array[k] = R[j];
+        animation.swap = [k, j];
         j++;
+        console.log("right");
       }
       k++;
+
+      console.log("i");
+      console.log(i);
+      console.log("j");
+      console.log(j);
+      animations.push(animation);
     }
     while (i < left) {
+      const animation = {};
+      animation.compare = [i, i];
+      animation.swap = [k, i];
+      animations.push(animation);
       array[k] = L[i];
       i++;
       k++;
     }
     while (j < right) {
+      const animation = {};
+      animation.compare = [j, j];
+      animation.swap = [k, j];
+      animations.push(animation);
       array[k] = R[j];
       j++;
       k++;
     }
   }
 
-  function mergeSort(array, left, right) {
+  function mergeSort(array, left, right, animations) {
     if (left < right) {
       var mid = Math.floor(left + (right - left) / 2);
-      console.log(mid);
-      mergeSort(array, left, mid);
-      mergeSort(array, mid + 1, right);
-      merge(array, left, mid, right);
+      mergeSort(array, left, mid, animations);
+      mergeSort(array, mid + 1, right, animations);
+      merge(array, left, mid, right, animations);
     }
     setArr(array);
+  }
+
+  function getAnimations(array, left, right) {
+    const animations = [];
+    mergeSort(array, left, right, animations);
     console.log("after mergesort");
-    console.log(array);
-    console.log(arr);
+    //console.log(arr);
+    console.log(testArr);
+    return animations;
+  }
+
+  function animate() {
+    //const animations = getAnimations(arr, LEFT, RIGHT);
+    const animations = getAnimations(testArr, 0, 6);
+    console.log(animations);
+    /*for(let i = 0; i < animations.length; i++){
+      const {compare, swap} = animations[i];
+      setTimeout(() => {
+
+      }
+    }*/
   }
 
   function combine() {
@@ -130,7 +175,8 @@ function App() {
       <button
         className="arraybutton"
         onClick={function () {
-          mergeSort(arr, LEFT, RIGHT);
+          /*mergeSort(arr, LEFT, RIGHT);*/
+          animate();
         }}
       >
         Mergesort
