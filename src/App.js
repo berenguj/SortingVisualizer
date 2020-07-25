@@ -10,9 +10,9 @@ function uuidv4() {
   });
 }
 
-var ARRAY_LENGTH = 300;
+var ARRAY_LENGTH = 100; //300;
 var LEFT = 0;
-var RIGHT = 299;
+var RIGHT = 99; //299;
 var testArr = [
   { key: 0, value: 38 },
   { key: 1, value: 27 },
@@ -70,29 +70,22 @@ function App() {
     k = l;
     while (i < left && j < right) {
       const animation = {};
-      animation.compare = [i, j];
+      animation.compare = [l + i, m + j];
       if (L[i].value <= R[j].value) {
         array[k] = L[i];
         animation.swap = [k, L[i].value];
         i++;
-        console.log("left");
       } else {
         array[k] = R[j];
         animation.swap = [k, R[j].value];
         j++;
-        console.log("right");
       }
       k++;
-
-      console.log("i");
-      console.log(i);
-      console.log("j");
-      console.log(j);
       animations.push(animation);
     }
     while (i < left) {
       const animation = {};
-      animation.compare = [i, i];
+      animation.compare = [l + i, l + i];
       animation.swap = [k, L[i].value];
       animations.push(animation);
       array[k] = L[i];
@@ -101,7 +94,7 @@ function App() {
     }
     while (j < right) {
       const animation = {};
-      animation.compare = [j, j];
+      animation.compare = [m + j, m + j];
       animation.swap = [k, R[j].value];
       animations.push(animation);
       array[k] = R[j];
@@ -123,9 +116,6 @@ function App() {
   function getAnimations(array, left, right) {
     const animations = [];
     mergeSort(array, left, right, animations);
-    console.log("after mergesort");
-    //console.log(arr);
-    console.log(testArr);
     return animations;
   }
 
@@ -153,29 +143,15 @@ function App() {
         }, i * 10);
       } else {
         setTimeout(() => {
-          const [barOneIndex, newHeight] = newAnimations[i];
+          let [barOneIndex, newHeight] = newAnimations[i];
           const barOneStyle = arrayBars[barOneIndex].style;
+          newHeight = arr[barOneIndex].value;
           barOneStyle.height = `${newHeight}px`;
-        });
+        }, i * 10);
       }
     }
-  }
-
-  function combine() {
-    var array = arr;
-    //console.log("arr in combine");
-    //checkArray();
-    //console.log("array");
-    //console.log(array);
-    array.sort((a, b) => a.value - b.value);
-    setArr(array);
+    console.log("after animations");
     console.log(arr);
-    //console.log(array);
-    //mergeSort(arr, LEFT, RIGHT);
-    //mergeSort(testArr, 0, 7);
-    //console.log("testarray");
-    //console.log(testArr);
-    //setArr(array);
   }
 
   function checkArray() {
