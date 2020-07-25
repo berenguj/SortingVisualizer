@@ -73,12 +73,12 @@ function App() {
       animation.compare = [i, j];
       if (L[i].value <= R[j].value) {
         array[k] = L[i];
-        animation.swap = [k, i];
+        animation.swap = [k, L[i].value];
         i++;
         console.log("left");
       } else {
         array[k] = R[j];
-        animation.swap = [k, j];
+        animation.swap = [k, R[j].value];
         j++;
         console.log("right");
       }
@@ -93,7 +93,7 @@ function App() {
     while (i < left) {
       const animation = {};
       animation.compare = [i, i];
-      animation.swap = [k, i];
+      animation.swap = [k, L[i].value];
       animations.push(animation);
       array[k] = L[i];
       i++;
@@ -102,7 +102,7 @@ function App() {
     while (j < right) {
       const animation = {};
       animation.compare = [j, j];
-      animation.swap = [k, j];
+      animation.swap = [k, R[j].value];
       animations.push(animation);
       array[k] = R[j];
       j++;
@@ -130,15 +130,35 @@ function App() {
   }
 
   function animate() {
-    //const animations = getAnimations(arr, LEFT, RIGHT);
-    const animations = getAnimations(testArr, 0, 6);
-    console.log(animations);
-    /*for(let i = 0; i < animations.length; i++){
-      const {compare, swap} = animations[i];
-      setTimeout(() => {
-
+    const animations = getAnimations(arr, LEFT, RIGHT);
+    //const animations = getAnimations(testArr, 0, 6);
+    //console.log(animations);
+    const newAnimations = [];
+    for (const animation of animations) {
+      newAnimations.push(animation.compare);
+      newAnimations.push(animation.compare);
+      newAnimations.push(animation.swap);
+    }
+    for (let i = 0; i < newAnimations.length; i++) {
+      const arrayBars = document.getElementsByClassName("array-bar");
+      const comparing = i % 3 !== 2;
+      if (comparing) {
+        const [barOneIndex, barTwoIndex] = newAnimations[i];
+        const barOneStyle = arrayBars[barOneIndex].style;
+        const barTwoStyle = arrayBars[barTwoIndex].style;
+        const color = i % 3 === 0 ? "blue" : "lightpink";
+        setTimeout(() => {
+          barOneStyle.backgroundColor = color;
+          barTwoStyle.backgroundColor = color;
+        }, i * 10);
+      } else {
+        setTimeout(() => {
+          const [barOneIndex, newHeight] = newAnimations[i];
+          const barOneStyle = arrayBars[barOneIndex].style;
+          barOneStyle.height = `${newHeight}px`;
+        });
       }
-    }*/
+    }
   }
 
   function combine() {
