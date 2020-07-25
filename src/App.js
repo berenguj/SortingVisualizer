@@ -10,9 +10,9 @@ function uuidv4() {
   });
 }
 
-var ARRAY_LENGTH = 100; //300;
+var ARRAY_LENGTH = 300;
 var LEFT = 0;
-var RIGHT = 99; //299;
+var RIGHT = 299;
 var testArr = [
   { key: 0, value: 38 },
   { key: 1, value: 27 },
@@ -140,14 +140,13 @@ function App() {
         setTimeout(() => {
           barOneStyle.backgroundColor = color;
           barTwoStyle.backgroundColor = color;
-        }, i * 10);
+        }, i * 5);
       } else {
         setTimeout(() => {
-          let [barOneIndex, newHeight] = newAnimations[i];
+          const [barOneIndex, newHeight] = newAnimations[i];
           const barOneStyle = arrayBars[barOneIndex].style;
-          newHeight = arr[barOneIndex].value;
           barOneStyle.height = `${newHeight}px`;
-        }, i * 10);
+        }, i * 5);
       }
     }
     console.log("after animations");
