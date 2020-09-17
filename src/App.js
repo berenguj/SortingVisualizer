@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "./App.css";
 import RandomArray from "./SortingVisualizer";
+import { mergeSort, bubbleSort } from "./SortingAlgos";
 
 function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
+      v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -30,7 +31,6 @@ function App() {
     var min = 5;
     var max = 500;
     var random;
-    var i = 0;
     random = Math.floor(Math.random() * (max - min + 1)) + min;
     setArr((prevArr) => {
       return [...prevArr, { id: uuidv4(), value: random }];
@@ -46,83 +46,31 @@ function App() {
     //console.log(arr);
   }
 
-  function merge(array, l, m, r, animations) {
-    var i, j, k;
-    var left = m - l + 1;
-    var right = r - m;
-
-    /*create temp arrays*/
-
-    var L = []; //array.slice(l, m);
-    var R = []; //array.slice(m + 1, r);
-
-    /*copy data*/
-    for (let i = 0; i < left; i++) {
-      L[i] = array[l + i];
-    }
-    for (let j = 0; j < right; j++) {
-      R[j] = array[m + 1 + j];
-    }
-
-    /*merge*/
-    i = 0;
-    j = 0;
-    k = l;
-    while (i < left && j < right) {
-      const animation = {};
-      animation.compare = [l + i, m + j];
-      if (L[i].value <= R[j].value) {
-        array[k] = L[i];
-        animation.swap = [k, L[i].value];
-        i++;
-      } else {
-        array[k] = R[j];
-        animation.swap = [k, R[j].value];
-        j++;
-      }
-      k++;
-      animations.push(animation);
-    }
-    while (i < left) {
-      const animation = {};
-      animation.compare = [l + i, l + i];
-      animation.swap = [k, L[i].value];
-      animations.push(animation);
-      array[k] = L[i];
-      i++;
-      k++;
-    }
-    while (j < right) {
-      const animation = {};
-      animation.compare = [m + j, m + j];
-      animation.swap = [k, R[j].value];
-      animations.push(animation);
-      array[k] = R[j];
-      j++;
-      k++;
-    }
-  }
-
-  function mergeSort(array, left, right, animations) {
-    if (left < right) {
-      var mid = Math.floor(left + (right - left) / 2);
-      mergeSort(array, left, mid, animations);
-      mergeSort(array, mid + 1, right, animations);
-      merge(array, left, mid, right, animations);
-    }
-    setArr(array);
-  }
-
-  function getAnimations(array, left, right) {
+  function getAnimations(array, left, right, algo) {
     const animations = [];
-    mergeSort(array, left, right, animations);
+    console.log(algo);
+    if (algo === "MergeSort") {
+      mergeSort(array, left, right, animations);
+    } else if (algo === "BubbleSort") {
+      console.log(array);
+      bubbleSort(array, animations);
+    }
     return animations;
   }
 
-  function animate() {
-    const animations = getAnimations(arr, LEFT, RIGHT);
+  function animate(algo) {
+    const animations = getAnimations(arr, LEFT, RIGHT, algo);
     //const animations = getAnimations(testArr, 0, 6);
     //console.log(animations);
+    console.log(arr);
+    if (algo === "MergeSort") {
+      mergeSortAnimation(animations);
+    } else if (algo === "BubbleSort") {
+      bubbleSortAnimation(animations);
+    }
+  }
+
+  function mergeSortAnimation(animations) {
     const newAnimations = [];
     for (const animation of animations) {
       newAnimations.push(animation.compare);
@@ -149,8 +97,43 @@ function App() {
         }, i * 5);
       }
     }
-    console.log("after animations");
-    console.log(arr);
+    //console.log("after animations");
+    //console.log(arr);
+  }
+
+  function bubbleSortAnimation(animations) {
+    const newAnimations = [];
+    for (const animation of animations) {
+      newAnimations.push(animation.compare);
+      newAnimations.push(animation.compare);
+      newAnimations.push(animation.swap);
+    }
+    for (let i = 0; i < newAnimations.length; i++) {
+      const arrayBars = document.getElementsByClassName("array-bar");
+      const comparing = i % 3 !== 2;
+      if (comparing) {
+        const [barOneIndex, barTwoIndex] = newAnimations[i];
+        const barOneStyle = arrayBars[barOneIndex].style;
+        const barTwoStyle = arrayBars[barTwoIndex].style;
+        const color = i % 3 === 0 ? "blue" : "lightpink";
+        setTimeout(() => {
+          barOneStyle.backgroundColor = color;
+          barTwoStyle.backgroundColor = color;
+        }, i * 5);
+      } else {
+        setTimeout(() => {
+          const [barOneIndex, barTwoIndex] = newAnimations[i - 1];
+          const [barOneHeight, barTwoHeight] = newAnimations[i];
+          if (barOneHeight.value != -1 && barTwoHeight.value != -1) {
+            /*if it is a valid swap*/
+            const barOneStyle = arrayBars[barOneIndex].style;
+            const barTwoStyle = arrayBars[barTwoIndex].style;
+            barOneStyle.height = `${barTwoHeight.value}px`;
+            barTwoStyle.height = `${barOneHeight.value}px`;
+          }
+        }, i * 5);
+      }
+    }
   }
 
   function checkArray() {
@@ -164,17 +147,22 @@ function App() {
       <button className="arraybutton" onClick={getRandomArray}>
         Create Random Array
       </button>
-      <button className="arraybutton" onClick={checkArray}>
-        Check Array
-      </button>
       <button
         className="arraybutton"
         onClick={function () {
           /*mergeSort(arr, LEFT, RIGHT);*/
-          animate();
+          animate("MergeSort");
         }}
       >
         Mergesort
+      </button>
+      <button
+        className="arraybutton"
+        onClick={function () {
+          animate("BubbleSort");
+        }}
+      >
+        Bubble Sort
       </button>
       <RandomArray array={arr} />
     </div>
